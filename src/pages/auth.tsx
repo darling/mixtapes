@@ -1,0 +1,60 @@
+import React from 'react';
+import {
+	AuthAction,
+	useAuthUser,
+	withAuthUser,
+	withAuthUserTokenSSR,
+} from 'next-firebase-auth';
+import Head from 'next/head';
+import { InferGetServerSidePropsType, NextPage } from 'next';
+import { getSpotifySignInUrl } from '@/util/spotify';
+import { Layout } from '@/components/layout/Layout';
+import { Container } from '@/components/layout/Container';
+
+const Page: NextPage<
+	InferGetServerSidePropsType<typeof getServerSideProps>
+> = () => {
+	const AuthUser = useAuthUser();
+
+	return (
+		<>
+			<Head>
+				<title>Create Next App</title>
+				<meta name="description" content="Mixtape" />
+				<meta
+					name="viewport"
+					content="width=device-width, initial-scale=1"
+				/>
+				<link rel="icon" href="/favicon.ico" />
+			</Head>
+			<Layout>
+				<Container>
+					<a href="/">Return Home</a>
+					<a href={getSpotifySignInUrl()}>Sign into spotify</a>
+					<p>
+						You are currently{' '}
+						{AuthUser.id
+							? `signed in as ${AuthUser.displayName}`
+							: `not signed in`}
+						.
+					</p>
+				</Container>
+			</Layout>
+		</>
+	);
+};
+
+export const getServerSideProps = withAuthUserTokenSSR({
+	whenAuthed: AuthAction.REDIRECT_TO_APP,
+})(async (context) => {
+	const spotifyUrl = getSpotifySignInUrl();
+
+	return {
+		redirect: {
+			destination: spotifyUrl,
+			permanent: false,
+		},
+	};
+});
+
+export default withAuthUser()(Page as any);
