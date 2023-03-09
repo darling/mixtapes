@@ -23,7 +23,9 @@ export const EditTrackSegment: FC<{ track: Track; mixtape: Mixtape }> = ({
 		mixtapeTrackUpdateSchema
 	);
 
-	const { register, handleSubmit, formState, reset } = useForm({
+	const { register, handleSubmit, formState, reset } = useForm<
+		Partial<Track>
+	>({
 		resolver,
 		defaultValues: {
 			pre_description: track.pre_description,

@@ -13,7 +13,9 @@ export const EditMixtape: FC<{ mixtape: Mixtape }> = ({ mixtape }) => {
 	const { mutate } = useSWRConfig();
 	const AuthUser = useAuthUser();
 	const resolver = useMixtapeContentValidationResolver(mixtapeContentSchema);
-	const { register, handleSubmit, formState, reset } = useForm({
+	const { register, handleSubmit, formState, reset } = useForm<
+		Partial<Mixtape>
+	>({
 		resolver,
 		defaultValues: {
 			title: mixtape.title,
