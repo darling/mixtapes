@@ -80,7 +80,7 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 		}
 	}, [step]);
 
-	if (isLoading)
+	if (isLoading && !props.mixtape)
 		return (
 			<>
 				<Layout>
