@@ -93,7 +93,7 @@ const handler: NextApiHandler = async (req, res) => {
 					name: AuthUser.displayName,
 				},
 				created_at: Date.now(),
-				public: false,
+				public: true,
 			});
 
 		return res.status(200).json({ mixtape: mixtape.id });

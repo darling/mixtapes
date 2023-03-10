@@ -25,7 +25,7 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
 			<Layout>
 				<Container>
 					<div
-						className="prose prose-stone"
+						className="prose prose-stone mx-auto"
 						dangerouslySetInnerHTML={{ __html: props.content }}
 					></div>
 				</Container>

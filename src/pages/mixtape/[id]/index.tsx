@@ -17,11 +17,11 @@ import { Container } from '@/components/layout/Container';
 import { Layout } from '@/components/layout/Layout';
 import { Cassette } from '@/components/misc/Cassette';
 import Link from 'next/link';
+import { getMixtape } from '@/util/admin/mixtape';
+import { useSWRConfig } from 'swr';
+import { PageTitle } from '@/components/misc/PageTitle';
 
 initAuth();
-
-const lorem =
-	'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl vel ultricies lacinia, nisl nisl aliquam nisl, vel aliquam nunc nisl eget nisl. Sed euismod, nisl vel ultricies lacinia, nisl nisl aliquam nisl, vel aliquam nunc nisl eget nisl.';
 
 const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 	props
@@ -80,14 +80,36 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 		}
 	}, [step]);
 
-	if (!data) return <div>Loading...</div>;
+	if (isLoading)
+		return (
+			<>
+				<Layout>
+					<Container>Loading...</Container>
+				</Layout>
+			</>
+		);
+
+	if (error)
+		return (
+			<Layout>
+				<Container>
+					<PageTitle>Looks like there's been an error!</PageTitle>
+					<pre>
+						<code>{JSON.stringify(error, null, 2)}</code>
+					</pre>
+				</Container>
+			</Layout>
+		);
+
+	let mixtape = data || props.mixtape;
 
 	return (
 		<>
 			<Head>
 				<title>
-					{data.title || 'A mixtape'} by{' '}
-					{data.from || data.creator.name} | A mixtape (but digital)
+					{mixtape.title || 'A mixtape'} by{' '}
+					{mixtape.from || mixtape.creator.name} | A mixtape (but
+					digital)
 				</title>
 				<meta name="description" content="Mixtape" />
 				<meta
@@ -98,14 +120,16 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 			</Head>
 			<Layout>
 				<Container>
-					<div className="max-w-xl mx-auto bg-purple-100 border-2 border-purple-500 text-purple-900 rounded-lg p-4 flex flex-row justify-between">
-						<h2>Manage your mixtape</h2>
-						<Link
-							className="px-4 py-2 rounded-md bg-purple-200"
-							href={`/mixtape/${mixtapeId}/edit`}
-						>
-							Edit
-						</Link>
+					<div hidden={mixtape.creator.id !== AuthUser?.id}>
+						<div className="max-w-xl mx-auto bg-purple-100 border-2 border-purple-500 text-purple-900 rounded-lg p-4 flex flex-row justify-between">
+							<h2>Manage your mixtape</h2>
+							<Link
+								className="px-4 py-2 rounded-md bg-purple-200"
+								href={`/mixtape/${mixtapeId}/edit`}
+							>
+								Edit
+							</Link>
+						</div>
 					</div>
 					<div
 						style={{
@@ -115,21 +139,22 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 					>
 						<div className="text-center flex flex-col gap-4 py-4">
 							<h1 className="text-4xl font-serif font-bold">
-								{data.title ||
-									'From: ' + (data.from || data.creator.name)}
+								{mixtape.title ||
+									'From: ' +
+										(mixtape.from || mixtape.creator.name)}
 							</h1>
-							<p>{data.description}</p>
+							<p>{mixtape.description}</p>
 							<div className="flex flex-row gap-4 mx-auto">
-								{data.to && <p>To: {data.to}</p>}
-								{data.from && <p>From: {data.from}</p>}
+								{mixtape.to && <p>To: {mixtape.to}</p>}
+								{mixtape.from && <p>From: {mixtape.from}</p>}
 							</div>
 						</div>
 						<div className="max-w-2xl h-full w-full mx-auto">
-							<Cassette mixtape={data} />
+							<Cassette mixtape={mixtape} />
 						</div>
 					</div>
 					<div className="flex flex-col">
-						{data.tracks.map((track, index) => {
+						{mixtape.tracks.map((track, index) => {
 							return (
 								<div key={track.name + track.id}>
 									<motion.div
@@ -170,7 +195,7 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 										</div>
 										<TrackSegment
 											track={track}
-											mixtapeId={data.id || ''}
+											mixtapeId={mixtape.id || ''}
 											index={index}
 										/>
 									</motion.div>
@@ -199,7 +224,7 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 									<div hidden={step > 0} className="ml-2">
 										<button
 											onClick={() =>
-												playSongOnSpotify(data)
+												playSongOnSpotify(mixtape)
 											}
 											className="bg-green-500 text-yellow-50 rounded-full py-2 px-4 "
 										>
@@ -222,12 +247,14 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 							</h2>
 							<p>
 								This mixtape was created on{' '}
-								{new Date(data.created_at).toLocaleDateString()}{' '}
-								{data.to ? ` for ${data.to}` : ''} by{' '}
-								{data.from || data.creator.name}. It contains{' '}
-								{data.tracks.length} special track
-								{data.tracks.length > 1 ? 's' : ''} picked just
-								for you.
+								{new Date(
+									mixtape.created_at
+								).toLocaleDateString()}{' '}
+								{mixtape.to ? ` for ${mixtape.to}` : ''} by{' '}
+								{mixtape.from || mixtape.creator.name}. It
+								contains {mixtape.tracks.length} special track
+								{mixtape.tracks.length > 1 ? 's' : ''} picked
+								just for you.
 							</p>
 							<p>
 								By connecting your spotify account, you can play
@@ -281,6 +308,38 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 	);
 };
 
-export const getServerSideProps = withAuthUserTokenSSR()();
+export const getServerSideProps = withAuthUserTokenSSR()(async (context) => {
+	const { id } = context.query;
+
+	const mixtape = await getMixtape(id as string);
+
+	if (!mixtape) {
+		return {
+			notFound: true,
+			props: {
+				mixtape: {} as Mixtape,
+			},
+		};
+	}
+
+	const AuthUser = context.AuthUser;
+
+	// Check if the user is the creator of the mixtape
+	// And if the mixtape is public
+	if (AuthUser?.id === mixtape.creator.id || mixtape.public) {
+		return {
+			props: {
+				mixtape,
+			},
+		};
+	}
+
+	return {
+		notFound: true,
+		props: {
+			mixtape: {} as Mixtape,
+		},
+	};
+});
 
 export default withAuthUser()(Page as any);

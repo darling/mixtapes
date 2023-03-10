@@ -33,6 +33,12 @@ export const Footer: FC = () => {
 							</Link>
 						))}
 					</div>
+					<div className="py-20 text-3xl lg:text-5xl font-serif font-bold">
+						Spread mixtapes not hate
+					</div>
+					<div className="py-20 text-stone-700 text-xs italic tracking-wider">
+						&copy; 2023 Carter (Safe) - All Rights Reserved
+					</div>
 				</Container>
 			</footer>
 		</>

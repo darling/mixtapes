@@ -10,6 +10,9 @@ import { InferGetServerSidePropsType, NextPage } from 'next';
 import { getSpotifySignInUrl } from '@/util/spotify';
 import { Layout } from '@/components/layout/Layout';
 import { Container } from '@/components/layout/Container';
+import initAuth from '@/initAuth';
+
+initAuth();
 
 const Page: NextPage<
 	InferGetServerSidePropsType<typeof getServerSideProps>
@@ -57,4 +60,6 @@ export const getServerSideProps = withAuthUserTokenSSR({
 	};
 });
 
-export default withAuthUser()(Page as any);
+export default withAuthUser({
+	whenAuthed: AuthAction.REDIRECT_TO_APP,
+})(Page as any);

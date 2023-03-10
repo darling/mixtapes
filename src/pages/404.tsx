@@ -5,21 +5,19 @@ import {
 	withAuthUserTokenSSR,
 } from 'next-firebase-auth';
 import Head from 'next/head';
-import { getSpotifySignInUrl } from '@/util/spotify';
-import Link from 'next/link';
+import { InferGetServerSidePropsType, NextPage } from 'next';
 import { Layout } from '@/components/layout/Layout';
 import { Container } from '@/components/layout/Container';
-import { HomeHero } from '@/components/home/Hero';
-import { HomeFeatures } from '@/components/home/Features';
-import { HomeCTA } from '@/components/home/CTA';
+import { PageTitle } from '@/components/misc/PageTitle';
+import Link from 'next/link';
 
-const Home = () => {
+const Page: NextPage = () => {
 	const AuthUser = useAuthUser();
 
 	return (
 		<>
 			<Head>
-				<title>Create a Digital Mixtape</title>
+				<title>404 | Mixtapes But Digital</title>
 				<meta name="description" content="Mixtape" />
 				<meta
 					name="viewport"
@@ -28,14 +26,18 @@ const Home = () => {
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 			<Layout>
-				<HomeHero />
-				<HomeFeatures />
-				<HomeCTA />
+				<Container>
+					<PageTitle>Lost?</PageTitle>
+					<div>
+						<p>Sorry, we couldn't find that page.</p>
+						<Link href={'/'}>
+							Click here to return to the homepage
+						</Link>
+					</div>
+				</Container>
 			</Layout>
 		</>
 	);
 };
 
-export const getServerSideProps = withAuthUserTokenSSR()();
-
-export default withAuthUser()(Home);
+export default withAuthUser()(Page as any);
