@@ -6,10 +6,6 @@ import { verifyIdToken } from 'next-firebase-auth';
 initAuth();
 
 const handler: NextApiHandler = async (req, res) => {
-	if (!req.headers || !req.headers.authorization) {
-		return res.status(401).json({ message: 'Unauthorized' });
-	}
-
 	const mixtapeId = req.query.id as string;
 	const mixtape = await getMixtape(mixtapeId);
 
@@ -19,7 +15,7 @@ const handler: NextApiHandler = async (req, res) => {
 
 	let AuthUser;
 
-	if (req.headers.authorization !== 'null') {
+	if (req.headers.authorization) {
 		try {
 			AuthUser = await verifyIdToken(req.headers.authorization);
 		} catch (error) {
