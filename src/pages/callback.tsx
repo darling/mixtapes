@@ -92,9 +92,22 @@ export const getServerSideProps = withAuthUserTokenSSR()(async (context) => {
 					);
 
 				// if the user doesn't exist, create them
-				const user = await auth().getUser(id);
+				let userExists = false;
 
-				if (!user) {
+				try {
+					await auth().getUser(id);
+					userExists = true;
+
+					await auth().updateUser(id, {
+						displayName: display_name,
+						email: email,
+						photoURL: images[0].url,
+					});
+				} catch (e) {
+					console.log(e);
+				}
+
+				if (!userExists) {
 					await auth().createUser({
 						uid: id,
 						displayName: display_name,
@@ -102,12 +115,6 @@ export const getServerSideProps = withAuthUserTokenSSR()(async (context) => {
 						photoURL: images[0].url,
 					});
 				}
-
-				await auth().updateUser(id, {
-					displayName: display_name,
-					email: email,
-					photoURL: images[0].url,
-				});
 
 				return {
 					props: {
