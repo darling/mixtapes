@@ -103,14 +103,14 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 
 	let mixtape = data || props.mixtape;
 
+	const title = `${mixtape.title || 'A mixtape'} by ${
+		mixtape.from || mixtape.creator.name
+	} | A mixtape (but digital)`;
+
 	return (
 		<>
-			<Head>
-				<title>
-					{mixtape.title || 'A mixtape'} by{' '}
-					{mixtape.from || mixtape.creator.name} | A mixtape (but
-					digital)
-				</title>
+			<Head key={mixtape.id}>
+				<title>{title}</title>
 				<meta name="description" content="Mixtape" />
 				<meta
 					name="viewport"
@@ -282,13 +282,13 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 								<input
 									className="bg-stone-700 w-full text-yellow-50 rounded-l-full py-2 pl-4"
 									contentEditable={false}
-									value={window.location.href}
+									value={`https://mixtapesbut.digital/mixtape/${mixtape.id}`}
 									readOnly
 								/>
 								<button
 									onClick={() =>
 										navigator.clipboard.writeText(
-											window.location.href
+											`https://mixtapesbut.digital/mixtape/${mixtape.id}`
 										)
 									}
 									className="bg-stone-700 text-yellow-50 rounded-r-full py-2 px-4"
