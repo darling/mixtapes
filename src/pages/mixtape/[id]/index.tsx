@@ -11,14 +11,13 @@ import { Mixtape } from '@/types/Mixtape';
 import axios from 'axios';
 import { TrackSegment } from '@/components/mixtape/TrackSegment';
 import { useRouter } from 'next/router';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useFetch } from '@/util/swr';
 import { Container } from '@/components/layout/Container';
 import { Layout } from '@/components/layout/Layout';
 import { Cassette } from '@/components/misc/Cassette';
 import Link from 'next/link';
 import { getMixtape } from '@/util/admin/mixtape';
-import { useSWRConfig } from 'swr';
 import { PageTitle } from '@/components/misc/PageTitle';
 
 initAuth();
@@ -40,7 +39,10 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 
 	const playSongOnSpotify = async (mixtape: Mixtape) => {
 		// if no AuthUser, return
-		if (!AuthUser || !AuthUser.id) return;
+		if (!AuthUser || !AuthUser.id) {
+			router.push('/auth');
+			return;
+		}
 
 		const trackIds = mixtape.tracks.map((track) => track.id);
 		// post these to /api/mixtape/play

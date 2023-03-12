@@ -6,12 +6,12 @@ import useSWRImmutable from 'swr/immutable';
 initAuth();
 
 const fetcher = async (url: string, AuthUser: AuthUser) => {
-	const token = (await AuthUser?.getIdToken()) || 'null';
+	const token = await AuthUser?.getIdToken();
 
 	try {
 		const response = await axios.get(url, {
 			headers: {
-				Authorization: `${token}`,
+				Authorization: token || undefined,
 			},
 		});
 		return response.data;
