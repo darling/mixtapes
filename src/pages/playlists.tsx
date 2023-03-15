@@ -119,5 +119,5 @@ export const getServerSideProps = withAuthUserTokenSSR({
 });
 
 export default withAuthUser({
-	whenUnauthedBeforeInit: AuthAction.REDIRECT_TO_LOGIN,
+	whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
 })(Page as any);
