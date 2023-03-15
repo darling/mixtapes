@@ -10,21 +10,21 @@ const features = [
 		name: 'Limited size',
 		description:
 			'Each mixtape is limited to 5 songs. Create an experience that only uses the perfect tracks to convey your feelings.',
-		href: '#',
+		href: '/about',
 		icon: CubeTransparentIcon,
 	},
 	{
 		name: 'Custom contents',
 		description:
 			"Listeners can't see tracks or the notes attached to each track ahead of time unless they open the mixtape or play it.",
-		href: '#',
+		href: '/about',
 		icon: PencilIcon,
 	},
 	{
 		name: 'Unique experiences',
 		description:
 			"Each mixtape is unique and immutable. Once you've made the mixtape it can't be changed.",
-		href: '#',
+		href: '/about',
 		icon: EyeIcon,
 	},
 ];

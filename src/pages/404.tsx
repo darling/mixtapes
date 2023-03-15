@@ -18,7 +18,10 @@ const Page: NextPage = () => {
 		<>
 			<Head>
 				<title>404 | Mixtapes But Digital</title>
-				<meta name="description" content="Mixtape" />
+				<meta
+					name="description"
+					content="Oops! The page you're looking for doesn't exist. Navigate back to MixtapesBut.Digital to continue creating and sharing personalized music collections with your loved ones."
+				></meta>
 				<meta
 					name="viewport"
 					content="width=device-width, initial-scale=1"

@@ -20,7 +20,10 @@ const Home = () => {
 		<>
 			<Head>
 				<title>Create a Digital Mixtape</title>
-				<meta name="description" content="Mixtape" />
+				<meta
+					name="description"
+					content="Welcome to MixtapesBut.Digital! Create and share personalized, intimate music collections with your loved ones. Connect your Spotify account and start curating your mixtape today."
+				></meta>
 				<meta
 					name="viewport"
 					content="width=device-width, initial-scale=1"
@@ -35,7 +38,5 @@ const Home = () => {
 		</>
 	);
 };
-
-export const getServerSideProps = withAuthUserTokenSSR()();
 
 export default withAuthUser()(Home);

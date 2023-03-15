@@ -15,7 +15,10 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
 		<>
 			<Head>
 				<title>Privacy Policy</title>
-				<meta name="description" content="Mixtape" />
+				<meta
+					name="description"
+					content="Discover MixtapesBut.Digital's Privacy Policy, which details how we handle and protect your personal information. Learn about our data collection, usage, and sharing practices to ensure a safe and secure experience."
+				/>
 				<meta
 					name="viewport"
 					content="width=device-width, initial-scale=1"

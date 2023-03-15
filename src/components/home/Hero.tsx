@@ -35,12 +35,12 @@ export const HomeHero: FC = () => {
 									Sign into Spotify
 								</Link>
 							)}
-							<a
-								href="#"
+							<Link
+								href="/about"
 								className="text-sm font-semibold leading-6 text-stone-700"
 							>
 								Learn more <span aria-hidden="true">→</span>
-							</a>
+							</Link>
 						</div>
 					</div>
 				</Container>

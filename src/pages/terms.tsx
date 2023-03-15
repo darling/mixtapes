@@ -15,7 +15,10 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
 		<>
 			<Head>
 				<title>Terms and Conditions</title>
-				<meta name="description" content="Mixtape" />
+				<meta
+					name="description"
+					content="Review the Terms of Service for MixtapesBut.Digital, which outline the rules and guidelines for using our music sharing platform. Make sure to read and understand our terms before creating and sharing mixtapes."
+				></meta>
 				<meta
 					name="viewport"
 					content="width=device-width, initial-scale=1"
