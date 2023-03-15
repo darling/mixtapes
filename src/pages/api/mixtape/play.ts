@@ -1,7 +1,9 @@
 import initAuth from '@/initAuth';
 import { getSpotifyAccessToken } from '@/util/admin/spotify';
+import { getSpotifySignInUrl } from '@/util/spotify';
 import axios from 'axios';
-import { auth, firestore } from 'firebase-admin';
+import { randomBytes } from 'crypto';
+import { auth, database } from 'firebase-admin';
 import { NextApiHandler } from 'next';
 import { verifyIdToken } from 'next-firebase-auth';
 import { array, object, string } from 'yup';
@@ -10,7 +12,13 @@ initAuth();
 
 let mixtapePlaySchema = object({
 	tracks: array().of(string()).max(5).min(1).required(),
+	mixtape: string().required(),
 });
+
+function generateState(length: number = 32): string {
+	const state = randomBytes(length).toString('hex');
+	return state;
+}
 
 const handler: NextApiHandler = async (req, res) => {
 	if (!req.headers || !req.headers.authorization) {
@@ -28,10 +36,12 @@ const handler: NextApiHandler = async (req, res) => {
 
 	// Make sure the body fits the schema
 	let mixtapeIds = [];
+	let mixtapeId;
 
 	try {
 		const body = await mixtapePlaySchema.validate(req.body);
 		mixtapeIds = body.tracks;
+		mixtapeId = body.mixtape;
 	} catch (error) {
 		return res.status(400).json({ message: 'Bad Request' });
 	}
@@ -47,12 +57,42 @@ const handler: NextApiHandler = async (req, res) => {
 
 	if (!access_token) {
 		await auth().revokeRefreshTokens(AuthUser.id);
-		return res.status(401).json({ message: 'Unauthorized' });
+
+		// store mixtape id with a session id for state login
+
+		const spotifyLoginUrl = getSpotifySignInUrl();
+
+		// add state to spotify login url
+
+		const url = new URL(spotifyLoginUrl);
+		if (mixtapeId) url.searchParams.append('state', mixtapeId);
+
+		// redirect to spotify login
+
+		return res.status(401).json({
+			message: 'Unauthorized',
+			redirect: url.toString(),
+		});
 	}
 
 	// Everything checks out, start playback
 
 	try {
+		// set shuffle to false
+
+		const shuffleRequest = await axios.put(
+			'https://api.spotify.com/v1/me/player/shuffle',
+			{},
+			{
+				headers: {
+					Authorization: `Bearer ${access_token}`,
+				},
+				params: {
+					state: false,
+				},
+			}
+		);
+
 		const playbackRequest = await axios.put(
 			'https://api.spotify.com/v1/me/player/play',
 			{
@@ -64,21 +104,6 @@ const handler: NextApiHandler = async (req, res) => {
 				},
 			}
 		);
-
-		// set shuffle to false
-
-		// const shuffleRequest = await axios.put(
-		// 	'https://api.spotify.com/v1/me/player/shuffle',
-		// 	{},
-		// 	{
-		// 		headers: {
-		// 			Authorization: `Bearer ${access_token}`,
-		// 		},
-		// 		params: {
-		// 			state: false,
-		// 		},
-		// 	}
-		// );
 
 		return res.status(200).json({ message: 'OK' });
 	} catch (error) {

@@ -8,8 +8,7 @@ import {
 import Head from 'next/head';
 import { getSpotifyAccessToken } from '@/util/admin/spotify';
 import { InferGetServerSidePropsType, NextPage } from 'next';
-import axios from 'axios';
-import { auth, firestore } from 'firebase-admin';
+import { firestore } from 'firebase-admin';
 import initAuth from '@/initAuth';
 import Link from 'next/link';
 import { Mixtape } from '@/types/Mixtape';

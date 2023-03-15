@@ -8,7 +8,7 @@ import Head from 'next/head';
 import { InferGetServerSidePropsType, NextPage } from 'next';
 import initAuth from '@/initAuth';
 import { Mixtape } from '@/types/Mixtape';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { TrackSegment } from '@/components/mixtape/TrackSegment';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
@@ -40,7 +40,7 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 	const playSongOnSpotify = async (mixtape: Mixtape) => {
 		// if no AuthUser, return
 		if (!AuthUser || !AuthUser.id) {
-			router.push('/auth');
+			router.push('/auth?mixtape=' + mixtape.id);
 			return;
 		}
 
@@ -51,6 +51,7 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 				'/api/mixtape/play',
 				{
 					tracks: trackIds,
+					mixtape: mixtape.id,
 				},
 				{
 					headers: {
@@ -64,8 +65,29 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 				setStep(step + 1);
 			}
 		} catch (error) {
-			AuthUser.signOut();
-			router.push('/');
+			// check if the error is axios error
+			if (axios.isAxiosError(error) && error instanceof AxiosError) {
+				// if it is, check if the error is 401
+				if (error && error.response && error.response.status === 401) {
+					// if it is, sign out the user and if there's a redirect in the response, redirect to that
+					AuthUser.signOut();
+
+					if (error.response.data.redirect) {
+						alert('You need to be logged in to do that!');
+						router.push(error.response.data.redirect);
+					} else {
+						router.push('/');
+					}
+				}
+
+				// if 500 or 400, show error
+
+				console.error(error);
+
+				alert(
+					'Something went wrong! Try playing a song on Spotify before pressing the button. If this keeps happening, please contact us.'
+				);
+			}
 		}
 	};
 
@@ -175,7 +197,7 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 											(step <= index
 												? 'hidden '
 												: 'min-h-screen ') +
-											'flex flex-col justify-center relative'
+											'flex flex-col justify-center relative pt-8'
 										}
 										id={`${index}`}
 									>
@@ -190,9 +212,13 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 												<span className="bg-stone-50 text-stone-700 px-3 mr-3 text-base leading-6">
 													{index + 1}
 												</span>
-												<span className="bg-stone-50 text-stone-700 px-3 text-base leading-6">
+												<Link
+													href={`https://open.spotify.com/track/${track.id}`}
+													target="_blank"
+													className="bg-stone-50 text-stone-700 px-3 text-base leading-6"
+												>
 													Spotify
-												</span>
+												</Link>
 											</div>
 										</div>
 										<TrackSegment

@@ -1,25 +1,37 @@
 import React, { useEffect } from 'react';
 import {
-	AuthAction,
 	useAuthUser,
 	withAuthUser,
 	withAuthUserTokenSSR,
 } from 'next-firebase-auth';
 import axios from 'axios';
 import { auth, firestore } from 'firebase-admin';
-import { NextPage } from 'next';
+import { InferGetServerSidePropsType, NextPage } from 'next';
 import { getAuth, signInWithCustomToken } from 'firebase/auth';
 import { getApp } from 'firebase/app';
 import initAuth from '@/initAuth';
+import { useRouter } from 'next/router';
 
 initAuth();
 
-const Page: NextPage<{ token: string }> = (props) => {
+const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
+	props
+) => {
 	const AuthUser = useAuthUser();
+	const router = useRouter();
 
 	useEffect(() => {
 		if (props.token !== '0' && AuthUser.clientInitialized) {
-			signInWithCustomToken(getAuth(getApp()), props.token);
+			signInWithCustomToken(getAuth(getApp()), props.token).then(() => {
+				// if there's a redirect, go there
+				if (props.redirect && props.redirect !== '/') {
+					router.push(props.redirect);
+				}
+
+				// otherwise, go to the home page
+
+				router.push('/');
+			});
 		}
 	}, [AuthUser, props.token]);
 
@@ -34,6 +46,7 @@ const SPOTIFY_API_TOKEN_URL = 'https://accounts.spotify.com/api/token';
 
 export const getServerSideProps = withAuthUserTokenSSR()(async (context) => {
 	const code = `${context.query.code}`;
+	const state = `${context.query.state}`;
 
 	if (code) {
 		const tokenRequestFormData = {
@@ -116,9 +129,21 @@ export const getServerSideProps = withAuthUserTokenSSR()(async (context) => {
 					});
 				}
 
+				// if state is set, look it up
+
+				if (state && state !== 'undefined' && state !== '') {
+					return {
+						props: {
+							token,
+							redirect: `/mixtape/${state}`,
+						},
+					};
+				}
+
 				return {
 					props: {
 						token,
+						redirect: '/',
 					},
 				};
 			}
@@ -128,10 +153,9 @@ export const getServerSideProps = withAuthUserTokenSSR()(async (context) => {
 	return {
 		props: {
 			token: '0',
+			redirect: '/',
 		},
 	};
 });
 
-export default withAuthUser({ whenAuthed: AuthAction.REDIRECT_TO_APP })(
-	Page as any
-);
+export default withAuthUser()(Page as any);

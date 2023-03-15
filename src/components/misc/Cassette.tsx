@@ -145,6 +145,11 @@ export const Cassette: FC<Props> = ({ mixtape }) => {
 						<p>{mixtapeDurationHuman}</p>
 						<p>{mixtapeCreatedHuman}</p>
 					</div>
+					<div className="flex justify-end">
+						<p className="text-xs font-serif text-stone-500">
+							MixtapesBut.Digital
+						</p>
+					</div>
 				</div>
 
 				<h2 className="font-sans lg:text-5xl text-2xl font-bold align-middle truncate pb-4">

@@ -6,11 +6,11 @@ import {
 	withAuthUserTokenSSR,
 } from 'next-firebase-auth';
 import Head from 'next/head';
-import { InferGetServerSidePropsType, NextPage } from 'next';
+import { NextPage } from 'next';
 import { Layout } from '@/components/layout/Layout';
 import { Container } from '@/components/layout/Container';
-import { PageTitle } from '@/components/misc/PageTitle';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 
 const Page: NextPage = () => {
 	const AuthUser = useAuthUser();
@@ -19,8 +19,11 @@ const Page: NextPage = () => {
 	return (
 		<>
 			<Head>
-				<title>Create Next App</title>
-				<meta name="description" content="Mixtape" />
+				<title>Manage Your Profile</title>
+				<meta
+					name="description"
+					content="View and manage your MixtapesBut.Digital profile. Personalize your account, access your mixtape creations, and explore shared mixtapes from others. Make the most of your music sharing experience."
+				></meta>
 				<meta
 					name="viewport"
 					content="width=device-width, initial-scale=1"
@@ -56,10 +59,18 @@ const Page: NextPage = () => {
 								mixtapes. This action cannot be undone.
 							</p>
 							<button
-								onClick={() => {
-									alert(
-										'Not implemented yet || Please email abuse@unworthy.net if not contact Safe'
-									);
+								onClick={async () => {
+									// send DELETE to /api/user/delete
+
+									await axios.delete('/api/user/delete', {
+										headers: {
+											Authorization: `${await AuthUser.getIdToken()}`,
+										},
+									});
+
+									AuthUser.signOut();
+
+									router.push('/');
 								}}
 								className="bg-red-300 text-red-900 py-2 px-4 rounded-lg shadow-md"
 							>
@@ -73,6 +84,11 @@ const Page: NextPage = () => {
 	);
 };
 
+export const getServerSideProps = withAuthUserTokenSSR({
+	whenUnauthed: AuthAction.REDIRECT_TO_LOGIN,
+})();
+
 export default withAuthUser({
 	whenAuthed: AuthAction.RENDER,
+	whenUnauthedBeforeInit: AuthAction.RENDER,
 })(Page as any);

@@ -50,7 +50,14 @@ const Page: NextPage<
 export const getServerSideProps = withAuthUserTokenSSR({
 	whenAuthed: AuthAction.REDIRECT_TO_APP,
 })(async (context) => {
-	const spotifyUrl = getSpotifySignInUrl();
+	let spotifyUrl = getSpotifySignInUrl();
+
+	// sometimes a mixtape id is passed in the query
+	const mixtapeId = context.query.mixtape as string;
+
+	if (mixtapeId) {
+		spotifyUrl += '&state=' + mixtapeId;
+	}
 
 	return {
 		redirect: {

@@ -36,7 +36,7 @@ const initAuth = () => {
 						'\n'
 					) ?? '',
 			},
-			databaseURL: 'https://mixtapes-89c52.firebaseio.com',
+			databaseURL: 'https://mixtapes-89c52-default-rtdb.firebaseio.com',
 		},
 		onVerifyTokenError: (error) => {
 			console.error(error);

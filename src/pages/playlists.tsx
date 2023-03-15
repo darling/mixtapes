@@ -101,7 +101,7 @@ export const getServerSideProps = withAuthUserTokenSSR({
 
 			return {
 				redirect: {
-					destination: '/',
+					destination: '/auth',
 					permanent: false,
 				},
 				props: {
