@@ -73,7 +73,9 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 	return (
 		<>
 			<Head>
-				<title>Create Next App</title>
+				<title>
+					Editing {data.title || 'Untitled'} | Mixtapes But Digital
+				</title>
 				<meta name="description" content="Mixtape" />
 				<meta
 					name="viewport"

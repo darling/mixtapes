@@ -1,7 +1,7 @@
 import initAuth from '@/initAuth';
 import { getSpotifyAccessToken } from '@/util/admin/spotify';
 import { getSpotifySignInUrl } from '@/util/spotify';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { randomBytes } from 'crypto';
 import { auth, database } from 'firebase-admin';
 import { NextApiHandler } from 'next';
@@ -107,7 +107,18 @@ const handler: NextApiHandler = async (req, res) => {
 
 		return res.status(200).json({ message: 'OK' });
 	} catch (error) {
-		console.error(error);
+		if (error instanceof AxiosError) {
+			console.error(error.response?.data?.error);
+
+			if (error.response?.data?.error) {
+				// than it's a spotify error
+
+				return res.status(400).json(error.response?.data?.error);
+			}
+		} else {
+			console.error(error);
+		}
+
 		return res.status(500).json({ message: 'Internal Server Error' });
 	}
 };

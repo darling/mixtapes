@@ -100,7 +100,10 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 	return (
 		<>
 			<Head>
-				<title>Create Next App</title>
+				<title>
+					Turning {props.playlist?.name || 'Untitled Playlist'} into a
+					Mixtape (but digital)
+				</title>
 				<meta name="description" content="Mixtape" />
 				<meta
 					name="viewport"

@@ -84,6 +84,17 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 
 				console.error(error);
 
+				// 400
+
+				if (error.response && error.response.status === 400) {
+					// inside the response, there should be a message
+					if (error.response.data.message) {
+						alert(error.response.data.message);
+					}
+
+					return;
+				}
+
 				alert(
 					'Something went wrong! Try playing a song on Spotify before pressing the button. If this keeps happening, please contact us.'
 				);

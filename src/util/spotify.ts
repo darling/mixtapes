@@ -9,11 +9,7 @@ export const getSpotifySignInUrl = () => {
 		'playlist-read-collaborative',
 		'user-read-private',
 		'user-read-email',
-		'user-read-playback-state',
 		'user-modify-playback-state',
-		'user-read-currently-playing',
-		'playlist-modify-public',
-		'playlist-modify-private',
 	];
 
 	const client_id = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || '';
