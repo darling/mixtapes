@@ -14,7 +14,6 @@ import initAuth from '@/initAuth';
 import { Layout } from '@/components/layout/Layout';
 import { Container } from '@/components/layout/Container';
 import { PageTitle } from '@/components/misc/PageTitle';
-import { generateRandomGradientSet } from '@/util/style/hashedGradient';
 import Link from 'next/link';
 
 initAuth();

@@ -146,6 +146,23 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 		<>
 			<Head key={mixtape.id}>
 				<title>{title}</title>
+				// og image /api/mixtape/og?id=${mixtape.id}&title=$
+				{mixtape.title}&author=${mixtape.creator.name}
+				<meta
+					property="og:title"
+					content={title || 'This is' + ' a Mixtape (but Digital)'}
+				/>
+				<meta property="og:type" content="website" />
+				<meta
+					property="og:url"
+					content={`https://mixtapesbut.digital/mixtape/${mixtape.id}`}
+				/>
+				<meta
+					property="og:image"
+					content={`https://mixtapesbut.digital/api/mixtape/og?id=${mixtape.id}&title=${mixtape.title}&author=${mixtape.creator.name}`}
+				/>
+				<meta property="og:description" content={mixtape.description} />
+				<meta property="og:site_name" content="Mixtapes but digital" />
 				<meta name="description" content="Mixtape" />
 				<meta
 					name="viewport"
@@ -208,30 +225,10 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 											(step <= index
 												? 'hidden '
 												: 'min-h-screen ') +
-											'flex flex-col justify-center relative pt-8'
+											'flex flex-col justify-center relative'
 										}
 										id={`${index}`}
 									>
-										<div className="relative">
-											<div
-												className="absolute inset-0 flex items-center"
-												aria-hidden="true"
-											>
-												<div className="w-full border-t border-stone-700" />
-											</div>
-											<div className="relative flex justify-center">
-												<span className="bg-stone-50 text-stone-700 px-3 mr-3 text-base leading-6">
-													{index + 1}
-												</span>
-												<Link
-													href={`https://open.spotify.com/track/${track.id}`}
-													target="_blank"
-													className="bg-stone-50 text-stone-700 px-3 text-base leading-6"
-												>
-													Spotify
-												</Link>
-											</div>
-										</div>
 										<TrackSegment
 											track={track}
 											mixtapeId={mixtape.id || ''}
