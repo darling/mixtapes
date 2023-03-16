@@ -145,9 +145,7 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 	return (
 		<>
 			<Head key={mixtape.id}>
-				<title>{title}</title>
-				// og image /api/mixtape/og?id=${mixtape.id}&title=$
-				{mixtape.title}&author=${mixtape.creator.name}
+				<title>{title || 'This is' + ' a Mixtape (but Digital)'}</title>
 				<meta
 					property="og:title"
 					content={title || 'This is' + ' a Mixtape (but Digital)'}
@@ -163,6 +161,16 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 				/>
 				<meta property="og:description" content={mixtape.description} />
 				<meta property="og:site_name" content="Mixtapes but digital" />
+
+				<meta name="twitter:card" content="summary_large_image" />
+				<meta name="twitter:site" content="@mixtapesbutdig" />
+				<meta name="twitter:creator" content="@mixtapesbutdig" />
+				<meta name="twitter:title" content={title} />
+				<meta
+					name="twitter:description"
+					content={mixtape.description}
+				/>
+
 				<meta name="description" content="Mixtape" />
 				<meta
 					name="viewport"
