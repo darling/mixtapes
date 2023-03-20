@@ -28,7 +28,7 @@ const Page: NextPage = () => {
 			</Head>
 			<Layout>
 				<Container>
-					<div className="mx-auto prose prose-headings:font-serif mt-44">
+					<div className="prose prose-headings:font-serif mt-44">
 						<h1>About MixtapesBut.Digital</h1>
 
 						<p>

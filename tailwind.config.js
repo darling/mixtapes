@@ -4,7 +4,6 @@ module.exports = {
 	theme: {
 		fontFamily: {
 			sans: ['Rubik', 'sans-serif'],
-			soft: ['Corben', 'serif'],
 			serif: ['Fraunces', 'serif'],
 		},
 	},
