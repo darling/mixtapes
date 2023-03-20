@@ -108,6 +108,10 @@ export const Cassette: FC<Props> = ({ mixtape }) => {
 								style={{
 									// multiply using the image as a mask
 									mixBlendMode: 'multiply',
+									// make sure the image is always on top and covers the entire div
+									zIndex: 1,
+									top: 0,
+									left: 0,
 								}}
 							/>
 							<div className="h-1/2"></div>
