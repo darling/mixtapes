@@ -30,11 +30,6 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 
 	const mixtapeId = router.query.id as string;
 
-	const { isLoading, error, data } = useFetch<Mixtape>(
-		'/api/mixtape/' + mixtapeId,
-		AuthUser
-	);
-
 	const [step, setStep] = React.useState(0);
 
 	const playSongOnSpotify = async (mixtape: Mixtape) => {
@@ -73,7 +68,9 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 					AuthUser.signOut();
 
 					if (error.response.data.redirect) {
-						alert('You need to be logged in to do that!');
+						alert(
+							'You need to be logged in to do that! We will redirect you to the login page now.'
+						);
 						router.push(error.response.data.redirect);
 					} else {
 						router.push('/');
@@ -94,10 +91,6 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 
 					return;
 				}
-
-				alert(
-					'Something went wrong! Try playing a song on Spotify before pressing the button. If this keeps happening, please contact us.'
-				);
 			}
 		}
 	};
@@ -115,28 +108,7 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 		}
 	}, [step]);
 
-	if (isLoading && !props.mixtape)
-		return (
-			<>
-				<Layout>
-					<Container>Loading...</Container>
-				</Layout>
-			</>
-		);
-
-	if (error)
-		return (
-			<Layout>
-				<Container>
-					<PageTitle>Looks like there's been an error!</PageTitle>
-					<pre>
-						<code>{JSON.stringify(error, null, 2)}</code>
-					</pre>
-				</Container>
-			</Layout>
-		);
-
-	let mixtape = data || props.mixtape;
+	let mixtape = props.mixtape;
 
 	const title = `${mixtape.title || 'A mixtape'} by ${
 		mixtape.from || mixtape.creator.name

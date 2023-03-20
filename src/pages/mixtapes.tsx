@@ -22,12 +22,10 @@ initAuth();
 const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 	props
 ) => {
-	const AuthUser = useAuthUser();
-
 	return (
 		<>
 			<Head>
-				<title key={'Title'}>{AuthUser.displayName}'s Playlists</title>
+				<title>Your Playlists</title>
 				<meta name="description" content="Mixtape" />
 				<meta
 					name="viewport"
@@ -97,6 +95,11 @@ export const getServerSideProps = withAuthUserTokenSSR({
 			documents.forEach((doc) => {
 				let tape = doc.data() as Mixtape;
 				tape.id = doc.id;
+
+				// strip out the tracks from each mixtape to save on bandwidth
+
+				tape.tracks = [];
+
 				output.push(tape);
 			});
 		} catch (error) {
@@ -107,6 +110,7 @@ export const getServerSideProps = withAuthUserTokenSSR({
 	return {
 		props: {
 			mixtapes: output,
+			username: AuthUser.displayName,
 		},
 	};
 });
