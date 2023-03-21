@@ -1,11 +1,12 @@
 import { Mixtape } from '@/types/Mixtape';
+import { useAutoResize } from '@/util/form/useAutoResize';
 import {
 	mixtapeContentSchema,
 	useMixtapeContentValidationResolver,
 } from '@/validation/mixtape/mixtapeContent';
 import axios from 'axios';
 import { useAuthUser } from 'next-firebase-auth';
-import { FC } from 'react';
+import { FC, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSWRConfig } from 'swr';
 
@@ -22,8 +23,14 @@ export const EditMixtape: FC<{ mixtape: Mixtape }> = ({ mixtape }) => {
 			description: mixtape.description,
 			to: mixtape.to,
 			from: mixtape.from,
+			public: mixtape.public,
 		},
 	});
+
+	const { ref: preRef, ...restOfPreRef } = register('description');
+	const preDescriptionRef = useRef<HTMLTextAreaElement>(null);
+
+	useAutoResize(preDescriptionRef);
 
 	const submitHandler = handleSubmit(async (data) => {
 		console.log('SUBMIT DATA', data);
@@ -48,7 +55,17 @@ export const EditMixtape: FC<{ mixtape: Mixtape }> = ({ mixtape }) => {
 
 		mutate('/api/mixtape/' + mixtape.id, response.data);
 
-		reset();
+		// override the local mixtape with the updated mixtape
+
+		if (response.data) {
+			reset({
+				title: response.data.title,
+				description: response.data.description,
+				to: response.data.to,
+				from: response.data.from,
+				public: response.data.public,
+			});
+		}
 	});
 
 	return (
@@ -59,7 +76,15 @@ export const EditMixtape: FC<{ mixtape: Mixtape }> = ({ mixtape }) => {
 			</div>
 			<div>
 				<label htmlFor="description">Description</label>
-				<textarea className="form-item" {...register('description')} />
+				<textarea
+					className="form-item resize-none"
+					{...restOfPreRef}
+					ref={(e) => {
+						preRef(e);
+						// @ts-ignore
+						preDescriptionRef.current = e;
+					}}
+				/>
 			</div>
 			<div className="grid grid-cols-2 gap-4">
 				<div>

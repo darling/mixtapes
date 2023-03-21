@@ -71,6 +71,7 @@ const handler: NextApiHandler = async (req, res) => {
 		const mixtapeTracks = spotifyTracks.map((track) => {
 			return {
 				id: track.id,
+				uri: track.uri,
 				name: track.name,
 				artists: track.artists.map((artist) => {
 					return {

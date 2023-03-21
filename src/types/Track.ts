@@ -2,6 +2,7 @@ import { Artist } from './Artist';
 
 export type Track = {
 	id: string;
+	uri: string;
 	name: string;
 	artists: Artist[];
 	image: string;

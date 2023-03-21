@@ -1,13 +1,14 @@
 import initAuth from '@/initAuth';
 import { Mixtape } from '@/types/Mixtape';
 import { Track } from '@/types/Track';
+import { useAutoResize } from '@/util/form/useAutoResize';
 import {
 	mixtapeTrackUpdateSchema,
 	useMixtapTrackUpdateValidationResolver,
 } from '@/validation/mixtape/trackContent';
 import axios from 'axios';
 import { useAuthUser } from 'next-firebase-auth';
-import { FC, useEffect } from 'react';
+import { FC, RefObject, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSWRConfig } from 'swr';
 
@@ -33,6 +34,14 @@ export const EditTrackSegment: FC<{ track: Track; mixtape: Mixtape }> = ({
 		},
 		mode: 'onChange',
 	});
+
+	const { ref: preRef, ...restOfPreRef } = register('pre_description');
+	const preDescriptionRef = useRef<HTMLTextAreaElement>(null);
+	const { ref: postRef, ...restOfPostRef } = register('post_description');
+	const postDescriptionRef = useRef<HTMLTextAreaElement>(null);
+
+	useAutoResize(preDescriptionRef);
+	useAutoResize(postDescriptionRef);
 
 	const submitHandler = handleSubmit(async (data) => {
 		const validData = await mixtapeTrackUpdateSchema.validate(data);
@@ -80,17 +89,27 @@ export const EditTrackSegment: FC<{ track: Track; mixtape: Mixtape }> = ({
 			<div>
 				<label htmlFor="pre_description">Pre-Description</label>
 				<textarea
-					className="form-item"
+					className="form-item resize-none"
 					placeholder="This will show up before the track"
-					{...register('pre_description')}
+					{...restOfPreRef}
+					ref={(e) => {
+						preRef(e);
+						// @ts-ignore - this is a hack to get around the fact that the ref is not a textarea element
+						preDescriptionRef.current = e;
+					}}
 				/>
 			</div>
 			<div>
 				<label htmlFor="post_description">Post-Description</label>
 				<textarea
-					className="form-item"
+					className="form-item resize-none"
 					placeholder="This will show up after the track"
-					{...register('post_description')}
+					{...restOfPostRef}
+					ref={(e) => {
+						postRef(e);
+						// @ts-ignore - this is a hack to get around the fact that the ref is not a textarea element
+						postDescriptionRef.current = e;
+					}}
 				/>
 			</div>
 			<div>

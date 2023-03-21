@@ -12,13 +12,12 @@ import axios, { AxiosError } from 'axios';
 import { TrackSegment } from '@/components/mixtape/TrackSegment';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
-import { useFetch } from '@/util/swr';
 import { Container } from '@/components/layout/Container';
 import { Layout } from '@/components/layout/Layout';
 import { Cassette } from '@/components/misc/Cassette';
 import Link from 'next/link';
 import { getMixtape } from '@/util/admin/mixtape';
-import { PageTitle } from '@/components/misc/PageTitle';
+import { generateRandomColorSet } from '@/util/style/hashedGradient';
 
 initAuth();
 
@@ -110,9 +109,8 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 
 	let mixtape = props.mixtape;
 
-	const title = `${mixtape.title || 'A mixtape'} by ${
-		mixtape.from || mixtape.creator.name
-	} | A mixtape (but digital)`;
+	const title = `${mixtape.title || 'A mixtape'} | a Mixtape (but Digital)`;
+	const colors = generateRandomColorSet(mixtape.id);
 
 	return (
 		<>
@@ -133,7 +131,6 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 				/>
 				<meta property="og:description" content={mixtape.description} />
 				<meta property="og:site_name" content="Mixtapes but digital" />
-
 				<meta name="twitter:card" content="summary_large_image" />
 				<meta name="twitter:site" content="@mixtapesbutdig" />
 				<meta name="twitter:creator" content="@mixtapesbutdig" />
@@ -142,6 +139,7 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 					name="twitter:description"
 					content={mixtape.description}
 				/>
+				<meta name="theme-color" content={colors?.[0] || '#000000'} />
 
 				<meta name="description" content="Mixtape" />
 				<meta
@@ -152,17 +150,6 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 			</Head>
 			<Layout>
 				<Container>
-					<div hidden={mixtape.creator.id !== AuthUser?.id}>
-						<div className="max-w-xl mx-auto bg-purple-100 border-2 border-purple-500 text-purple-900 rounded-lg p-4 flex flex-row justify-between">
-							<h2>Manage your mixtape</h2>
-							<Link
-								className="px-4 py-2 rounded-md bg-purple-200"
-								href={`/mixtape/${mixtapeId}/edit`}
-							>
-								Edit
-							</Link>
-						</div>
-					</div>
 					<div
 						style={{
 							minHeight: '80vh',
@@ -220,9 +207,9 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 						})}
 
 						<div className="flex flex-col">
-							{step < 5 && (
+							{step < mixtape.tracks.length && (
 								<motion.div
-									className="mx-auto flex flex-row items-start"
+									className="mx-auto flex flex-col md:flex-row gap-2 items-start"
 									layout
 									animate={{ opacity: 1 }}
 									initial={{ opacity: 0 }}
@@ -237,7 +224,7 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 											? 'View Contents'
 											: 'View next track'}
 									</button>
-									<div hidden={step > 0} className="ml-2">
+									<div hidden={step > 0}>
 										<button
 											onClick={() =>
 												playSongOnSpotify(mixtape)
@@ -250,6 +237,15 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 											Might require sign-in
 										</div>
 									</div>
+									<Link
+										href={`/mixtape/${mixtape.id}/edit`}
+										className="bg-stone-700 text-yellow-50 rounded-full py-2 px-4"
+										hidden={
+											mixtape.creator.id !== AuthUser?.id
+										}
+									>
+										Edit Mixtape
+									</Link>
 								</motion.div>
 							)}
 						</div>

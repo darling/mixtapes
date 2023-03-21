@@ -65,8 +65,6 @@ const handler: NextApiHandler = async (req, res) => {
 			}
 		});
 
-		console.log(mixtapeUpdate);
-
 		// Update the mixtape in Firestore
 		const ref = await documentRef.update({
 			...mixtapeUpdate,
@@ -74,10 +72,6 @@ const handler: NextApiHandler = async (req, res) => {
 
 		let newMixtape = {
 			...mixtape,
-		};
-
-		newMixtape = {
-			...newMixtape,
 			...mixtapeUpdate,
 		};
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
 	AuthAction,
 	useAuthUser,
@@ -6,22 +6,42 @@ import {
 	withAuthUserTokenSSR,
 } from 'next-firebase-auth';
 import Head from 'next/head';
-import { getSpotifyAccessToken } from '@/util/admin/spotify';
-import { InferGetServerSidePropsType, NextPage } from 'next';
-import axios from 'axios';
-import { auth } from 'firebase-admin';
+import { NextPage } from 'next';
 import initAuth from '@/initAuth';
 import { Layout } from '@/components/layout/Layout';
 import { Container } from '@/components/layout/Container';
-import { PageTitle } from '@/components/misc/PageTitle';
+import { PageTitleWithDescription } from '@/components/misc/PageTitle';
 import Link from 'next/link';
+import { useFetch } from '@/util/swr';
 
 initAuth();
 
-const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
-	props
-) => {
+type Playlist = {
+	id: string;
+	name: string;
+	image?: string;
+	tracks: number;
+};
+
+const Page: NextPage = () => {
 	const AuthUser = useAuthUser();
+
+	useEffect(() => {}, [AuthUser]);
+
+	const [page, setPage] = React.useState(0);
+	const { data, isLoading, error } = useFetch<Playlist[]>(
+		'/api/spotify/playlists?page=' + page,
+		AuthUser
+	);
+
+	const changePage = (page: number) => {
+		setPage(page);
+
+		window.scrollTo({
+			top: 0,
+			behavior: 'smooth',
+		});
+	};
 
 	return (
 		<>
@@ -36,10 +56,52 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 			</Head>
 			<Layout>
 				<Container>
-					<PageTitle>Your Spotify Playlists</PageTitle>
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-						{props.playlists.map((playlist) => {
-							const playlistCoverImage = playlist.images[0];
+					<PageTitleWithDescription title="Your Spotify Playlists">
+						Choose which playlist you want to turn into a mixtape.
+						Ideally the playlist will have 5 songs. I suggest
+						picking and ordering the 5 songs inside a playlist
+						before you start here.
+					</PageTitleWithDescription>
+					<div hidden={!isLoading}>Loading...</div>
+					<div>
+						{error && (
+							<pre>
+								<p>
+									<strong>Error:</strong>
+									There's been an error fetching your
+									playlists. Try again.
+								</p>
+								<code>{JSON.stringify(error, null, 2)}</code>
+							</pre>
+						)}
+					</div>
+					<div
+						hidden={isLoading}
+						className="my-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+					>
+						<button
+							className="bg-stone-100 hover:bg-stone-200 text-stone-900 font-bold py-2 px-4 rounded-lg"
+							onClick={() => changePage(page - 1)}
+							disabled={page === 0}
+							hidden={page === 0}
+						>
+							Previous
+						</button>
+						<button
+							className="bg-stone-100 hover:bg-stone-200 text-stone-900 font-bold py-2 px-4 rounded-lg"
+							onClick={() => changePage(page + 1)}
+							disabled={(data?.length || 0) < 50}
+							hidden={(data?.length || 0) < 50}
+						>
+							Next
+						</button>
+					</div>
+					<div
+						hidden={isLoading || data?.length === 0}
+						className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+					>
+						{data?.map((playlist) => {
+							const playlistCoverImage = playlist.image;
 
 							return (
 								<Link
@@ -48,8 +110,8 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 									key={playlist.id}
 								>
 									<img
-										src={playlistCoverImage?.url}
-										className="h-full shadow-sm rounded-lg aspect-square"
+										src={playlistCoverImage}
+										className="h-full shadow-sm rounded-lg aspect-square w-full object-cover object-center"
 									/>
 									<div className="pb-8 overflow-hidden">
 										<h2 className="font-bold truncate tracking-wider">
@@ -60,6 +122,43 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 							);
 						})}
 					</div>
+					<div hidden={isLoading || data?.length !== 0}>
+						<p
+							hidden={page !== 0}
+							className="text-center text-stone-900 font-bold py-2 px-4 rounded-lg"
+						>
+							No playlists found. Try adding some to your Spotify
+							account.
+						</p>
+						<p
+							hidden={page === 0}
+							className="text-center text-stone-900 font-bold py-2 px-4 rounded-lg"
+						>
+							This page is empty because of math or something,
+							sorry.
+						</p>
+					</div>
+					<div
+						hidden={isLoading}
+						className="my-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+					>
+						<button
+							className="bg-stone-100 hover:bg-stone-200 text-stone-900 font-bold py-2 px-4 rounded-lg"
+							onClick={() => changePage(page - 1)}
+							disabled={page === 0}
+							hidden={page === 0}
+						>
+							Previous
+						</button>
+						<button
+							className="bg-stone-100 hover:bg-stone-200 text-stone-900 font-bold py-2 px-4 rounded-lg"
+							onClick={() => changePage(page + 1)}
+							disabled={(data?.length || 0) < 50}
+							hidden={(data?.length || 0) < 50}
+						>
+							Next
+						</button>
+					</div>
 				</Container>
 			</Layout>
 		</>
@@ -68,55 +167,8 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 
 export const getServerSideProps = withAuthUserTokenSSR({
 	whenUnauthed: AuthAction.REDIRECT_TO_LOGIN,
-})(async (context) => {
-	const { AuthUser } = context;
-
-	const output = [];
-
-	if (AuthUser.id) {
-		const spotifyAccessToken = await getSpotifyAccessToken(AuthUser.id);
-
-		if (spotifyAccessToken) {
-			const response =
-				await axios.get<SpotifyApi.ListOfUsersPlaylistsResponse>(
-					`https://api.spotify.com/v1/me/playlists`,
-					{
-						headers: {
-							Authorization: `Bearer ${spotifyAccessToken}`,
-						},
-						params: {
-							limit: 50,
-						},
-					}
-				);
-
-			const data = response.data;
-
-			if (data.items) {
-				output.push(...data.items);
-			}
-		} else {
-			await auth().revokeRefreshTokens(AuthUser.id);
-
-			return {
-				redirect: {
-					destination: '/auth',
-					permanent: false,
-				},
-				props: {
-					playlists: [],
-				},
-			};
-		}
-	}
-
-	return {
-		props: {
-			playlists: output,
-		},
-	};
-});
+})();
 
 export default withAuthUser({
-	whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
+	whenUnauthedBeforeInit: AuthAction.REDIRECT_TO_LOGIN,
 })(Page as any);

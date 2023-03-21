@@ -1,7 +1,7 @@
 import initAuth from '@/initAuth';
 import axios from 'axios';
 import { AuthUser } from 'next-firebase-auth';
-import useSWRImmutable from 'swr/immutable';
+import useSWR from 'swr';
 
 initAuth();
 
@@ -26,7 +26,5 @@ export const useFetch = <Data = any, Error = any>(
 	url: string,
 	AuthUser: AuthUser
 ) => {
-	return useSWRImmutable<Data, Error>(url, (url: string) =>
-		fetcher(url, AuthUser)
-	);
+	return useSWR<Data, Error>(url, (url: string) => fetcher(url, AuthUser));
 };
