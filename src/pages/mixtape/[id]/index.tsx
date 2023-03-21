@@ -172,7 +172,7 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 							<Cassette mixtape={mixtape} />
 						</div>
 					</div>
-					<div className="flex flex-col">
+					<div className="">
 						{mixtape.tracks.map((track, index) => {
 							return (
 								<div key={track.name + track.id}>
@@ -206,10 +206,10 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 							);
 						})}
 
-						<div className="flex flex-col">
+						<div>
 							{step < mixtape.tracks.length && (
 								<motion.div
-									className="mx-auto flex flex-col md:flex-row gap-2 items-start"
+									className="w-full md:w-fit md:mx-auto flex flex-col md:flex-row gap-2 items-start text-center"
 									layout
 									animate={{ opacity: 1 }}
 									initial={{ opacity: 0 }}
@@ -218,28 +218,31 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 								>
 									<button
 										onClick={scrollNext}
-										className="bg-stone-700 text-yellow-50 rounded-full py-2 px-4"
+										className="w-full md:w-auto bg-stone-700 text-yellow-50 rounded-full py-2 px-4"
 									>
 										{step === 0
 											? 'View Contents'
 											: 'View next track'}
 									</button>
-									<div hidden={step > 0}>
+									<div
+										className="w-full md:w-auto "
+										hidden={step > 0}
+									>
 										<button
 											onClick={() =>
 												playSongOnSpotify(mixtape)
 											}
-											className="bg-green-500 text-yellow-50 rounded-full py-2 px-4 "
+											className="w-full md:w-auto bg-green-500 text-yellow-50 rounded-full py-2 px-4 "
 										>
 											Play on Spotify
 										</button>
-										<div className="italic text-xs text-stone-700 text-center">
+										<div className="italic text-xs text-stone-700">
 											Might require sign-in
 										</div>
 									</div>
 									<Link
 										href={`/mixtape/${mixtape.id}/edit`}
-										className="bg-stone-700 text-yellow-50 rounded-full py-2 px-4"
+										className="w-full md:w-auto bg-stone-700 text-yellow-50 rounded-full py-2 px-4"
 										hidden={
 											mixtape.creator.id !== AuthUser?.id
 										}

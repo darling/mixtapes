@@ -111,7 +111,7 @@ const Page: NextPage = () => {
 								>
 									<img
 										src={playlistCoverImage}
-										className="h-full shadow-sm rounded-lg aspect-square w-full object-cover object-center"
+										className="shadow-sm rounded-lg aspect-square"
 									/>
 									<div className="pb-8 overflow-hidden">
 										<h2 className="font-bold truncate tracking-wider">
