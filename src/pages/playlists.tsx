@@ -62,19 +62,28 @@ const Page: NextPage = () => {
 						picking and ordering the 5 songs inside a playlist
 						before you start here.
 					</PageTitleWithDescription>
-					<div hidden={!isLoading}>Loading...</div>
-					<div>
-						{error && (
-							<pre>
-								<p>
-									<strong>Error:</strong>
-									There's been an error fetching your
-									playlists. Try again.
-								</p>
+					{error && (
+						<pre>
+							<p>
+								<strong>Error:</strong>
+								There's been an error fetching your playlists.
+								Try again.
+							</p>
+							<p>
+								<strong>Details:</strong>
+
 								<code>{JSON.stringify(error, null, 2)}</code>
-							</pre>
-						)}
-					</div>
+							</p>
+							<button
+								onClick={() => {
+									AuthUser.signOut();
+								}}
+							>
+								Sometimes, you might need to relogin to Spotify.
+								Click here to do that.
+							</button>
+						</pre>
+					)}
 					<div
 						hidden={isLoading}
 						className="my-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
@@ -122,6 +131,12 @@ const Page: NextPage = () => {
 							);
 						})}
 					</div>
+					<div
+						hidden={!isLoading}
+						className="text-center text-stone-900 font-bold py-2 px-4 rounded-lg animate-spin"
+					>
+						Loading...
+					</div>
 					<div hidden={isLoading || data?.length !== 0}>
 						<p
 							hidden={page !== 0}
@@ -138,10 +153,7 @@ const Page: NextPage = () => {
 							sorry.
 						</p>
 					</div>
-					<div
-						hidden={isLoading}
-						className="my-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-					>
+					<div className="my-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 						<button
 							className="bg-stone-100 hover:bg-stone-200 text-stone-900 font-bold py-2 px-4 rounded-lg"
 							onClick={() => changePage(page - 1)}
@@ -170,5 +182,5 @@ export const getServerSideProps = withAuthUserTokenSSR({
 })();
 
 export default withAuthUser({
-	whenUnauthedBeforeInit: AuthAction.REDIRECT_TO_LOGIN,
+	whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
 })(Page as any);

@@ -102,7 +102,7 @@ export const Cassette: FC<Props> = ({ mixtape }) => {
 							}}
 						>
 							<img
-								className="absolute w-full h-full"
+								className="absolute w-full"
 								src="https://grainy-gradients.vercel.app/noise.svg"
 								alt={mixtape.title}
 								style={{
@@ -146,8 +146,8 @@ export const Cassette: FC<Props> = ({ mixtape }) => {
 						</div>
 					</div>
 					<div className="text-sm text-stone-300 flex flex-row justify-between">
-						<p>{mixtapeDurationHuman}</p>
-						<p>{mixtapeCreatedHuman}</p>
+						<p className="truncate">{mixtape.title}</p>
+						<p className="flex-shrink-0">{mixtapeCreatedHuman}</p>
 					</div>
 					<div className="flex justify-end">
 						<p className="text-xs font-serif text-stone-500">

@@ -157,15 +157,29 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 						className="flex flex-col py-16 justify-items-stretch justify-between"
 					>
 						<div className="text-center flex flex-col gap-4 py-4">
-							<h1 className="text-4xl font-serif font-bold">
+							<h1 className="text-4xl font-serif font-bold break-all">
 								{mixtape.title ||
 									'From: ' +
 										(mixtape.from || mixtape.creator.name)}
 							</h1>
-							<p>{mixtape.description}</p>
+							<p className="break-all">{mixtape.description}</p>
 							<div className="flex flex-row gap-4 mx-auto">
-								{mixtape.to && <p>To: {mixtape.to}</p>}
-								{mixtape.from && <p>From: {mixtape.from}</p>}
+								{mixtape.to && (
+									<p>
+										To: <br />
+										<span className="break-all">
+											{mixtape.to}
+										</span>
+									</p>
+								)}
+								{mixtape.from && (
+									<p className="break-all">
+										From: <br />
+										<span className="break-all">
+											{mixtape.from}
+										</span>
+									</p>
+								)}
 							</div>
 						</div>
 						<div className="max-w-2xl h-full w-full mx-auto">
@@ -260,14 +274,14 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 							<h2 className="text-3xl text-center font-serif">
 								What is this?
 							</h2>
-							<p>
-								This mixtape was created on{' '}
+							<p className="break-all">
+								This mixtape was created{' '}
 								{new Date(
 									mixtape.created_at
 								).toLocaleDateString()}{' '}
 								{mixtape.to ? ` for ${mixtape.to}` : ''} by{' '}
-								{mixtape.from || mixtape.creator.name}. It
-								contains {mixtape.tracks.length} special track
+								{mixtape.creator.name}. It contains{' '}
+								{mixtape.tracks.length} special track
 								{mixtape.tracks.length > 1 ? 's' : ''} picked
 								just for you.
 							</p>

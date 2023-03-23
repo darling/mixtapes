@@ -59,7 +59,7 @@ const TrackDescriptionTextArea: FC<{
 	track: Track;
 }> = ({ value }) => {
 	const basicClass =
-		'md:text-xl font-sans placeholder:italic min-h-fit ring-none ring-purple-500 py-4 my-4 w-full';
+		'md:text-xl font-sans placeholder:italic min-h-fit ring-none ring-purple-500 py-4 my-4 w-full break-all';
 
 	if (!value || value == '') return <></>;
 
