@@ -59,13 +59,13 @@ const TrackDescriptionTextArea: FC<{
 	track: Track;
 }> = ({ value }) => {
 	const basicClass =
-		'md:text-xl font-sans placeholder:italic min-h-fit ring-none ring-purple-500 py-4 my-4 w-full break-all';
+		'md:text-xl font-sans placeholder:italic min-h-fit ring-none ring-purple-500 py-4 my-4 w-full';
 
 	if (!value || value == '') return <></>;
 
 	return (
 		<div
-			className="whitespace-pre-wrap break-words md:leading-relaxed"
+			className="whitespace-pre-wrap md:leading-relaxed"
 			hidden={value == ''}
 		>
 			<p className={basicClass}>{value}</p>
